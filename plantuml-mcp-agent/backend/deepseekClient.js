@@ -17,7 +17,7 @@ Never return raw PlantUML DSL to the user — always render it via the tool.
 Best practices for DSL:
 - Use \`skinparam\` for styling where appropriate.
 - Add meaningful labels and notes for clarity.
-- If the requested diagram would be very large (>30 elements), decompose it into multiple focused diagrams.
+- Generate ONE diagram per user request. If the diagram would be very large (>30 elements), generate a single high-level overview and offer to drill down into specific areas.
 - Support themes via the theme parameter in generate_diagram.`;
 
 const SYSTEM_PROMPT_WITH_CONTEXT = `You are a diagram assistant with access to a parsed C# / C++ codebase.
@@ -83,7 +83,7 @@ function toolResultToString(toolResult) {
   if (hasImage) {
     const meta = toolResult.content.find(c => c.type === 'text');
     const extra = meta ? ` (${meta.text})` : '';
-    return `Diagram generated successfully. It is already displayed in the UI${extra}. Do NOT include a markdown image link in your response.`;
+    return `Diagram generated successfully${extra}. It is now visible in the UI.`;
   }
   return toolResult.content
     .filter(c => c.type === 'text')
@@ -128,7 +128,7 @@ async function runAgenticLoop({
 
   // Agentic loop
   let iterations = 0;
-  const MAX_ITERATIONS = 10;
+  const MAX_ITERATIONS = 20;
 
   while (iterations < MAX_ITERATIONS) {
     iterations++;
