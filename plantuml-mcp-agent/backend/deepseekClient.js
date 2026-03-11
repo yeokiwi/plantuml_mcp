@@ -9,7 +9,8 @@ const SYSTEM_PROMPT_NO_CONTEXT = `You are a diagram assistant powered by PlantUM
 1. Determine the appropriate PlantUML diagram type.
 2. Write complete, valid PlantUML DSL (always include @startuml / @enduml).
 3. Call the \`generate_diagram\` tool with the DSL.
-4. When the tool returns, present the diagram to the user and offer to refine it.
+4. When the tool returns, the diagram is already displayed in the UI. Tell the user it has been generated and offer to refine it.
+   IMPORTANT: Do NOT include a markdown image link (e.g. ![...](...)) in your response — the UI renders the image automatically.
 If unsure about diagram type, call \`list_diagram_types\` first.
 Never return raw PlantUML DSL to the user — always render it via the tool.
 
@@ -26,7 +27,7 @@ The user has loaded a source directory. When generating diagrams:
    as the authoritative source for diagram content.
 3. Generate PlantUML DSL that faithfully reflects the actual code — do NOT
    invent classes or relationships not present in the symbol model.
-4. Call \`generate_diagram\` to render the DSL.
+4. Call \`generate_diagram\` to render the DSL. The diagram is displayed in the UI automatically — do NOT include a markdown image link in your response.
 5. Cite which source files contributed to the diagram (mention them in your response).
 
 If the user asks about a specific class or module, call \`get_symbol_summary\`
@@ -76,6 +77,14 @@ function extractDiagramFromToolResult(toolResult) {
  */
 function toolResultToString(toolResult) {
   if (!toolResult?.content) return 'Tool returned no content';
+  // If the result contains an image, the UI renders it automatically.
+  // Tell the LLM so it does not try to embed a fake image link.
+  const hasImage = toolResult.content.some(c => c.type === 'image');
+  if (hasImage) {
+    const meta = toolResult.content.find(c => c.type === 'text');
+    const extra = meta ? ` (${meta.text})` : '';
+    return `Diagram generated successfully. It is already displayed in the UI${extra}. Do NOT include a markdown image link in your response.`;
+  }
   return toolResult.content
     .filter(c => c.type === 'text')
     .map(c => c.text)
