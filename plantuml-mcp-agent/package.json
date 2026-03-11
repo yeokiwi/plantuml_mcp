@@ -1,0 +1,14 @@
+{
+  "name": "plantuml-mcp-agent",
+  "version": "1.0.0",
+  "description": "LLM ↔ PlantUML MCP Agent with code-context-aware diagram generation",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "npm install && cd mcp-server && npm install && cd ../code-parser-server && npm install && cd ../backend && npm install && cd ../frontend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

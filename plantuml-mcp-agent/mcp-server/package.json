@@ -1,0 +1,15 @@
+{
+  "name": "plantuml-mcp-server",
+  "version": "1.0.0",
+  "description": "PlantUML MCP Server — renders PlantUML DSL to PNG/SVG",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "pako": "^2.1.0",
+    "js-base64": "^3.7.7",
+    "node-fetch": "^3.3.2"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "code-parser-mcp-server",
+  "version": "1.0.0",
+  "description": "Code Parser MCP Server — parses C# and C++ source code for diagram generation",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "tree-sitter": "^0.21.0",
+    "tree-sitter-cpp": "^0.22.0"
+  }
+}
