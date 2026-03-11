@@ -19,9 +19,8 @@ const REMOTE_URL = (process.env.PLANTUML_REMOTE_URL || 'https://www.plantuml.com
  * Encode DSL for plantuml.com remote API using pako + base64url
  */
 async function encodeDslForRemote(dsl) {
-  const { deflate } = require('pako');
-  const { fromUint8Array } = require('js-base64');
-  const compressed = deflate(dsl, { level: 9 });
+  const { deflateRaw } = require('pako');
+  const compressed = deflateRaw(dsl, { level: 9 });
   // plantuml.com uses a custom base64 encoding table
   const encode64Char = (b) => {
     if (b < 10) return String.fromCharCode(48 + b);
