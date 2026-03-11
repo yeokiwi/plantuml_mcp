@@ -14,6 +14,27 @@ const { runAgenticLoop } = require('./deepseekClient');
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
 
+// ── Path security helper ──────────────────────────────────────────────────────
+function checkPathAllowed(dirPath) {
+  if (dirPath.includes('..')) {
+    return { allowed: false, status: 400, error: 'INVALID_PATH', message: 'Path must not contain ".." traversal sequences.' };
+  }
+  const allowedPaths = (process.env.ALLOWED_BASE_PATHS || '')
+    .split(',').map(p => p.trim()).filter(Boolean);
+  if (allowedPaths.length === 0) return { allowed: true };
+  if (!allowedPaths.some(base => dirPath.startsWith(base))) {
+    return {
+      allowed: false,
+      status: 403,
+      error: 'ACCESS_DENIED',
+      message: `Path "${dirPath}" is not under an allowed directory.\n` +
+               `Allowed prefixes: ${allowedPaths.join(', ')}\n` +
+               `To allow all paths, set ALLOWED_BASE_PATHS= (empty) in your .env file and restart the server.`
+    };
+  }
+  return { allowed: true };
+}
+
 // Middleware
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
@@ -116,6 +137,11 @@ app.post('/api/code/browse', async (req, res) => {
     return res.status(400).json({ error: 'INVALID_REQUEST', message: 'path is required' });
   }
 
+  const guard = checkPathAllowed(dirPath);
+  if (!guard.allowed) {
+    return res.status(guard.status).json({ error: guard.error, message: guard.message });
+  }
+
   try {
     const result = await codeParserClient.browseDirectory(dirPath);
     const textContent = result.content?.find(c => c.type === 'text');
@@ -140,6 +166,11 @@ app.post('/api/code/parse', async (req, res) => {
 
   if (!dirPath) {
     return res.status(400).json({ error: 'INVALID_REQUEST', message: 'path is required' });
+  }
+
+  const guard = checkPathAllowed(dirPath);
+  if (!guard.allowed) {
+    return res.status(guard.status).json({ error: guard.error, message: guard.message });
   }
 
   const session = sessionId || uuidv4();

@@ -303,8 +303,18 @@ Install a JDK (Java 11+). On Ubuntu/Debian: `sudo apt install default-jdk`. On m
 **No C# or C++ files found**
 Make sure the directory you entered contains `.cs`, `.cpp`, `.h`, or `.hpp` files. Hidden directories and `node_modules`/`bin`/`obj` folders are automatically skipped.
 
-**Access denied when loading a directory**
-The path is outside `ALLOWED_BASE_PATHS`. Add the parent directory to that list in `.env` and restart the backend.
+**"Access denied. This directory is not in the list of allowed paths."**
+Your `.env` has `ALLOWED_BASE_PATHS` set to a list that does not include the directory you entered. Fix it one of two ways:
+
+- **Allow all paths** (simplest for local development) — set the value to empty and restart:
+  ```env
+  ALLOWED_BASE_PATHS=
+  ```
+- **Add your specific directory** — append its prefix to the list:
+  ```env
+  ALLOWED_BASE_PATHS=/home,/workspace,/my/custom/path
+  ```
+Restart the backend after editing `.env`.
 
 **Port already in use**
 Change `PORT` in `.env` for the backend, or kill the process holding the port:

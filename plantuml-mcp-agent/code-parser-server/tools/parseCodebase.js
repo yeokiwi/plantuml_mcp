@@ -103,7 +103,7 @@ async function handleParseCodebase(args) {
   const allowedPaths = (process.env.ALLOWED_BASE_PATHS || '').split(',').map(p => p.trim()).filter(Boolean);
   if (allowedPaths.length > 0 && !allowedPaths.some(base => dirPath.startsWith(base))) {
     return {
-      content: [{ type: 'text', text: JSON.stringify({ error: 'ACCESS_DENIED', message: 'Path not in allowed directories' }) }],
+      content: [{ type: 'text', text: JSON.stringify({ error: 'ACCESS_DENIED', message: `Path "${dirPath}" is not under an allowed directory. Allowed prefixes: ${allowedPaths.join(', ')}. To allow all paths, clear ALLOWED_BASE_PATHS in your .env file.` }) }],
       isError: true
     };
   }
